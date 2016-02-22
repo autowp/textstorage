@@ -1,0 +1,21 @@
+{
+    "name": "autowp/textstorage",
+    "description": "TextStorage service for autowp.ru",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dmitry Pereslegin",
+            "email": "dmitry@pereslegin.ru",
+            "homepage": "http://pereslegin.ru"
+        }
+    ],
+    "minimum-stability": "beta",
+    "require": {
+        "zendframework/zendframework1": "1.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Autowp\\TextStorage\\": "src/"
+        }
+    }
+}
