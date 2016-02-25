@@ -147,9 +147,9 @@ class Service
 
         if ($row) {
             return $row->text;
-        } else {
-            return null;
         }
+        
+        return null;
     }
 
     public function getTextInfo($id)
@@ -163,9 +163,9 @@ class Service
                 'text'     => $row->text,
                 'revision' => $row->revision
             );
-        } else {
-            return null;
         }
+        
+        return null;
     }
 
     public function getRevisionInfo($id, $revision)
@@ -181,9 +181,9 @@ class Service
                 'revision' => $row->revision,
                 'user_id'  => $row->user_id
             );
-        } else {
-            return null;
         }
+        
+        return null;
     }
 
     public function setText($id, $text, $userId)
