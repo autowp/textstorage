@@ -11,7 +11,6 @@ use Zend_Db_Table_Abstract;
 
 class Service
 {
-
     /**
      * Zend_Db_Adapter_Abstract object.
      *
@@ -42,7 +41,7 @@ class Service
     /**
      * @param array $options
      */
-    public function __construct(array $options = array())
+    public function __construct(array $options = [])
     {
         $this->setOptions($options);
     }
@@ -57,8 +56,8 @@ class Service
         foreach ($options as $key => $value) {
             $method = 'set' . ucfirst($key);
 
-            if (method_exists($this, $method)) {
-                !$this->raise("Unexpected option '$key'");
+            if (!method_exists($this, $method)) {
+                $this->raise("Unexpected option '$key'");
             }
             
             $this->$method($value);
@@ -115,10 +114,10 @@ class Service
     private function getTextTable()
     {
         if (null === $this->textTable) {
-            $this->textTable = new Zend_Db_Table(array(
+            $this->textTable = new Zend_Db_Table([
                 Zend_Db_Table_Abstract::ADAPTER => $this->db,
                 Zend_Db_Table_Abstract::NAME    => $this->textTableName,
-            ));
+            ]);
         }
 
         return $this->textTable;
@@ -130,10 +129,10 @@ class Service
     private function getRevisionTable()
     {
         if (null === $this->revisionTable) {
-            $this->revisionTable = new Zend_Db_Table(array(
+            $this->revisionTable = new Zend_Db_Table([
                 Zend_Db_Table_Abstract::ADAPTER => $this->db,
                 Zend_Db_Table_Abstract::NAME    => $this->revisionTableName,
-            ));
+            ]);
         }
 
         return $this->revisionTable;
@@ -141,9 +140,9 @@ class Service
 
     public function getText($id)
     {
-        $row = $this->getTextTable()->fetchRow(array(
+        $row = $this->getTextTable()->fetchRow([
             'id = ?' => (int)$id
-        ));
+        ]);
 
         if ($row) {
             return $row->text;
@@ -154,15 +153,15 @@ class Service
 
     public function getTextInfo($id)
     {
-        $row = $this->getTextTable()->fetchRow(array(
+        $row = $this->getTextTable()->fetchRow([
             'id = ?' => (int)$id
-        ));
+        ]);
 
         if ($row) {
-            return array(
+            return [
                 'text'     => $row->text,
                 'revision' => $row->revision
-            );
+            ];
         }
         
         return null;
@@ -170,17 +169,17 @@ class Service
 
     public function getRevisionInfo($id, $revision)
     {
-        $row = $this->getRevisionTable()->fetchRow(array(
+        $row = $this->getRevisionTable()->fetchRow([
             'text_id = ?' => (int)$id,
             'revision =?' => (int)$revision
-        ));
+        ]);
 
         if ($row) {
-            return array(
+            return [
                 'text'     => $row->text,
                 'revision' => $row->revision,
                 'user_id'  => $row->user_id
-            );
+            ];
         }
         
         return null;
@@ -188,9 +187,9 @@ class Service
 
     public function setText($id, $text, $userId)
     {
-        $row = $this->getTextTable()->fetchRow(array(
+        $row = $this->getTextTable()->fetchRow([
             'id = ?' => (int)$id
-        ));
+        ]);
 
         if (!$row) {
             return $this->raise('Text `' . $id . '` not found');
@@ -198,20 +197,20 @@ class Service
 
         if ($row->text != $text) {
 
-            $row->setFromArray(array(
+            $row->setFromArray([
                 'revision'     => new Zend_Db_Expr('revision + 1'),
                 'text'         => $text,
                 'last_updated' => new Zend_Db_Expr('NOW()')
-            ));
+            ]);
             $row->save();
 
-            $revisionRow = $this->getRevisionTable()->createRow(array(
+            $revisionRow = $this->getRevisionTable()->createRow([
                 'text_id'   => $row->id,
                 'revision'  => $row->revision,
                 'text'      => $row->text,
                 'timestamp' => $row->last_updated,
                 'user_id'   => $userId
-            ));
+            ]);
             $revisionRow->save();
         }
 
@@ -220,11 +219,11 @@ class Service
 
     public function createText($text, $userId)
     {
-        $row = $this->getTextTable()->createRow(array(
+        $row = $this->getTextTable()->createRow([
             'revision'     => 0,
             'text'         => '',
             'last_updated' => new Zend_Db_Expr('NOW()')
-        ));
+        ]);
         $row->save();
 
         return $this->setText($row->id, $text, $userId);
@@ -236,6 +235,7 @@ class Service
         $db = $table->getAdapter();
         return $db->fetchCol(
             $db->select()
+                ->distinct()
                 ->from($table->info('name'), 'user_id')
                 ->where('user_id')
                 ->where('text_id = ?', (int)$id)
