@@ -10,6 +10,7 @@ class SereviceTest extends \PHPUnit_Framework_TestCase
 {
     const EXAMPLE_TEXT = 'Example text';
     const EXAMPLE_TEXT_2 = 'Example text 2';
+    const EXAMPLE_TEXT_3 = 'Example text 3';
     const EXAMPLE_USER_ID = 1;
 
     /**
@@ -62,5 +63,20 @@ class SereviceTest extends \PHPUnit_Framework_TestCase
 
         $text = $storage->getFirstText([$textId2, $textId1]);
         $this->assertEquals(self::EXAMPLE_TEXT_2, $text);
+    }
+
+    public function testSecondTextNotAffectsFirst()
+    {
+        $storage = $this->getStorage();
+
+        $textId1 = $storage->createText(self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);
+        $textInfo1 = $storage->getTextInfo($textId1);
+
+        $textId2 = $storage->createText(self::EXAMPLE_TEXT_2, self::EXAMPLE_USER_ID);
+
+        $storage->setText($textId2, self::EXAMPLE_TEXT_3, self::EXAMPLE_USER_ID);
+
+        $newTextInfo1 = $storage->getTextInfo($textId1);
+        $this->assertEquals($textInfo1, $newTextInfo1);
     }
 }

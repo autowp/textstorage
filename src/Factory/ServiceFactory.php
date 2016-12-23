@@ -14,9 +14,7 @@ class ServiceFactory implements FactoryInterface
         $config = $container->has('config') ? $container->get('config') : [];
         $textstorageConfig = isset($config['textstorage']) ? $config['textstorage'] : [];
 
-        if (isset($textstorageConfig['dbAdapter'])) {
-            $textstorageConfig['dbAdapter'] = $container->get($textstorageConfig['dbAdapter']);
-        }
+        $textstorageConfig['dbAdapter'] = $container->get(\Zend\Db\Adapter\AdapterInterface::class);
 
         return new Service($textstorageConfig);
     }
