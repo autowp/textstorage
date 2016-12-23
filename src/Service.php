@@ -210,7 +210,7 @@ class Service
         $row = $this->getTextRow($id);
 
         if (! $row) {
-            return $this->raise('Text `' . $id . '` not found');
+            return $this->raise(sprintf('Text `%s` not found', $id));
         }
 
         if ($row['text'] != $text) {
@@ -219,7 +219,7 @@ class Service
                 'text'         => $text,
                 'last_updated' => new Expression('NOW()')
             ], [
-                'id = ?' => $row['id']
+                'id' => $row['id']
             ]);
 
             $row = $this->getTextRow($row['id']);
