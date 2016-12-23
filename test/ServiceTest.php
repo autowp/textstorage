@@ -79,7 +79,7 @@ class SereviceTest extends \PHPUnit_Framework_TestCase
         $newTextInfo1 = $storage->getTextInfo($textId1);
         $this->assertEquals($textInfo1, $newTextInfo1);
     }
-    
+
     /**
      * @expectedException \Autowp\TextStorage\Exception
      */
@@ -89,37 +89,40 @@ class SereviceTest extends \PHPUnit_Framework_TestCase
             'foo' => 'bar'
         ]);
     }
-    
+
     public function testReturnNullOnEmptyIds()
     {
         $storage = $this->getStorage();
-        
+
         $text = $storage->getFirstText([]);
-        
+
         $this->assertNull($text);
     }
-    
+
     public function testReturnNullWhenNothingFound()
     {
         $storage = $this->getStorage();
-    
+
         $result = $storage->getText(123456789);
         $this->assertNull($result);
-        
+
         $result = $storage->getTextInfo(123456789);
         $this->assertNull($result);
-        
+
         $result = $storage->getFirstText([123456789]);
         $this->assertNull($result);
+
+        $result = $storage->getRevisionInfo(123456789, 1);
+        $this->assertNull($result);
     }
-    
+
     /**
      * @expectedException \Autowp\TextStorage\Exception
      */
     public function testThrowExceptionWhenSetUnexistentText()
     {
         $storage = $this->getStorage();
-        
+
         $storage->setText(123456789, self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);
     }
 }
