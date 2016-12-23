@@ -49,4 +49,18 @@ class SereviceTest extends \PHPUnit_Framework_TestCase
         $userIds = $storage->getTextUserIds($textId);
         $this->assertEquals([self::EXAMPLE_USER_ID], $userIds);
     }
+
+    public function testGetFirstText()
+    {
+        $storage = $this->getStorage();
+
+        $textId1 = $storage->createText(self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);
+        $textId2 = $storage->createText(self::EXAMPLE_TEXT_2, self::EXAMPLE_USER_ID);
+
+        $text = $storage->getFirstText([$textId1, $textId2]);
+        $this->assertEquals(self::EXAMPLE_TEXT, $text);
+
+        $text = $storage->getFirstText([$textId2, $textId1]);
+        $this->assertEquals(self::EXAMPLE_TEXT_2, $text);
+    }
 }
