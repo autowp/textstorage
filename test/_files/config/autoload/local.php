@@ -10,7 +10,7 @@ return [
     'db' => [
         'driver'         => 'Pdo',
         'pdodriver'      => 'mysql',
-        'host'           => 'localhost',
+        'host'           => '127.0.0.1',
         'charset'        => 'utf8',
         'dbname'         => 'autowp_test',
         'username'       => 'autowp_test',
