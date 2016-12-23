@@ -56,10 +56,10 @@ class Service
         foreach ($options as $key => $value) {
             $method = 'set' . ucfirst($key);
 
-            if (!method_exists($this, $method)) {
+            if (! method_exists($this, $method)) {
                 $this->raise("Unexpected option '$key'");
             }
-            
+
             $this->$method($value);
         }
 
@@ -138,6 +138,25 @@ class Service
         return $this->revisionTable;
     }
 
+    public function getFirstText(array $ids)
+    {
+        if (! $ids) {
+            return null;
+        }
+        $db = $this->getTextTable()->getAdapter();
+        $expr = $db->quoteInto('FIELD(id, ?)', $ids);
+
+        $row = $this->getTextTable()->fetchRow([
+            'id IN (?)' => $ids
+        ], new \Zend_Db_Expr($expr));
+
+        if ($row) {
+            return $row->text;
+        }
+
+        return null;
+    }
+
     public function getText($id)
     {
         $row = $this->getTextTable()->fetchRow([
@@ -147,7 +166,7 @@ class Service
         if ($row) {
             return $row->text;
         }
-        
+
         return null;
     }
 
@@ -163,7 +182,7 @@ class Service
                 'revision' => $row->revision
             ];
         }
-        
+
         return null;
     }
 
@@ -181,7 +200,7 @@ class Service
                 'user_id'  => $row->user_id
             ];
         }
-        
+
         return null;
     }
 
@@ -191,12 +210,11 @@ class Service
             'id = ?' => (int)$id
         ]);
 
-        if (!$row) {
+        if (! $row) {
             return $this->raise('Text `' . $id . '` not found');
         }
 
         if ($row->text != $text) {
-
             $row->setFromArray([
                 'revision'     => new Zend_Db_Expr('revision + 1'),
                 'text'         => $text,

@@ -24,7 +24,7 @@ return [
     ],
     'service_manager' => [
         'factories' => [
-            Zend_Db_Adapter_Abstract::class => function($serviceManager) {
+            Zend_Db_Adapter_Abstract::class => function ($serviceManager) {
                 $config = $serviceManager->get('Config');
                 $resource = new Zend_Application_Resource_Db($config['db']);
                 return $resource->init();

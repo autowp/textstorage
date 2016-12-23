@@ -14,4 +14,3 @@ if (class_exists('PHPUnit_Runner_Version', true)) {
  * Setup autoloading
  */
 require __DIR__ . '/../vendor/autoload.php';
-

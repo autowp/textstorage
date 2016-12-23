@@ -13,11 +13,11 @@ class ServiceFactory implements FactoryInterface
     {
         $config = $container->has('config') ? $container->get('config') : [];
         $textstorageConfig = isset($config['textstorage']) ? $config['textstorage'] : [];
-        
+
         if (isset($textstorageConfig['dbAdapter'])) {
             $textstorageConfig['dbAdapter'] = $container->get($textstorageConfig['dbAdapter']);
         }
-    
+
         return new Service($textstorageConfig);
     }
 }
