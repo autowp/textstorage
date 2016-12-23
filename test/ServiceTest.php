@@ -125,30 +125,42 @@ class SereviceTest extends \PHPUnit_Framework_TestCase
 
         $storage->setText(123456789, self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);
     }
-    
+
     public function testRevisionNumberIncresed()
     {
         $storage = $this->getStorage();
-    
+
         $textId = $storage->createText(self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);
         $textInfo1 = $storage->getTextInfo($textId);
-    
+
         $storage->setText($textId, self::EXAMPLE_TEXT_2, self::EXAMPLE_USER_ID);
         $textInfo2 = $storage->getTextInfo($textId);
-    
-        $this->assertEquals($textInfo1['revision']+1, $textInfo2['revision']);
+
+        $this->assertEquals($textInfo1['revision'] + 1, $textInfo2['revision']);
     }
-    
+
     public function testRevisionNumberNotIncresedWhenTextNotChanged()
     {
         $storage = $this->getStorage();
-    
+
         $textId = $storage->createText(self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);
         $textInfo1 = $storage->getTextInfo($textId);
-    
+
         $storage->setText($textId, self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);
         $textInfo2 = $storage->getTextInfo($textId);
-    
+
         $this->assertEquals($textInfo1['revision'], $textInfo2['revision']);
+    }
+
+    public function testGetFirstTextIgnoreEmptyText()
+    {
+        $storage = $this->getStorage();
+
+        $textId1 = $storage->createText('', self::EXAMPLE_USER_ID);
+        $textId2 = $storage->createText(self::EXAMPLE_TEXT_2, self::EXAMPLE_USER_ID);
+
+        $text = $storage->getFirstText([$textId1, $textId2]);
+
+        $this->assertEquals(self::EXAMPLE_TEXT_2, $text);
     }
 }

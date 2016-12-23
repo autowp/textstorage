@@ -137,10 +137,11 @@ class Service
         }
         $row = $this->getTextTable()->select(function (Select $select) use ($ids) {
             $select
+                ->columns(['text'])
                 ->where([
-                    'id' => $ids
+                    'id' => $ids,
+                    'length(text) > 0'
                 ])
-                ->where(new Expression('length(text) > 0'))
                 ->order(new Expression(
                     'FIELD(id, '.implode(', ', array_fill(0, count($ids), '?')).')',
                     $ids
