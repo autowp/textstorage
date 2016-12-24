@@ -75,7 +75,7 @@ class Service
 
     /**
      * @param Adapter $dbAdapter
-     * @return TextStorage
+     * @return Service
      */
     public function setDbAdapter(Adapter $dbAdapter)
     {
@@ -86,7 +86,7 @@ class Service
 
     /**
      * @param string $name
-     * @return TextStorage
+     * @return Service
      */
     public function setTextTableName($name)
     {
@@ -97,7 +97,7 @@ class Service
 
     /**
      * @param string $name
-     * @return TextStorage
+     * @return Service
      */
     public function setRevisionTableName($name)
     {
@@ -242,7 +242,7 @@ class Service
     {
         $table = $this->getTextTable();
 
-        $row = $table->insert([
+        $table->insert([
             'revision'     => 0,
             'text'         => '',
             'last_updated' => new Expression('NOW()')
@@ -253,10 +253,7 @@ class Service
 
     public function getTextUserIds($id)
     {
-        $table = $this->getRevisionTable();
-        $db = $table->getAdapter();
-
-        $rows = $table->select(function (Select $select) use ($id) {
+        $rows = $this->getRevisionTable()->select(function (Select $select) use ($id) {
             $select
                 ->columns(['user_id'])
                 ->quantifier(Select::QUANTIFIER_DISTINCT);
