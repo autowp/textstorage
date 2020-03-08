@@ -157,7 +157,7 @@ class Service
         if ($row) {
             return [
                 'text'     => $row['text'],
-                'revision' => $row['revision'],
+                'revision' => (int) $row['revision'],
             ];
         }
 

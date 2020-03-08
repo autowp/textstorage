@@ -130,6 +130,8 @@ class ServiceTest extends TestCase
      */
     public function testThrowExceptionWhenSetUnexistentText(): void
     {
+        $this->expectException(TextStorage\Exception::class);
+
         $storage = $this->getStorage();
 
         $storage->setText(123456789, self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);
