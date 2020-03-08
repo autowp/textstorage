@@ -19,13 +19,13 @@ use function ucfirst;
 class Service
 {
     /** @var Adapter */
-    private Adapter $adapter;
+    private ?Adapter $adapter;
 
     /** @var TableGateway */
-    private TableGateway $textTable;
+    private ?TableGateway $textTable;
 
     /** @var TableGateway */
-    private TableGateway $revisionTable;
+    private ?TableGateway $revisionTable;
 
     /** @var string */
     private string $textTableName = 'textstorage_text';
@@ -38,6 +38,9 @@ class Service
      */
     public function __construct(array $options = [])
     {
+        $this->adapter       = null;
+        $this->textTable     = null;
+        $this->revisionTable = null;
         $this->setOptions($options);
     }
 
