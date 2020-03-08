@@ -202,7 +202,7 @@ class Service
                 'id' => $row['id'],
             ]);
 
-            $row = $this->getTextRow($row['id']);
+            $row = $this->getTextRow($id);
 
             $this->getRevisionTable()->insert([
                 'text_id'   => $row['id'],
@@ -213,7 +213,7 @@ class Service
             ]);
         }
 
-        return (int) $row->id;
+        return (int) $row['id'];
     }
 
     /**
@@ -229,7 +229,7 @@ class Service
             'last_updated' => new Expression('NOW()'),
         ]);
 
-        return $this->setText($table->getLastInsertValue(), $text, $userId);
+        return $this->setText((int) $table->getLastInsertValue(), $text, $userId);
     }
 
     public function getTextUserIds(int $id): array
@@ -244,7 +244,7 @@ class Service
 
         $ids = [];
         foreach ($rows as $row) {
-            $ids[] = $row['user_id'];
+            $ids[] = (int) $row['user_id'];
         }
 
         return $ids;
