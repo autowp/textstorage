@@ -6,19 +6,16 @@ namespace AutowpTest\TextStorage;
 
 use Autowp\TextStorage;
 use Laminas\Mvc\Application;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class ServiceTest extends PHPUnit_Framework_TestCase
+class ServiceTest extends TestCase
 {
     private const EXAMPLE_TEXT    = 'Example text';
     private const EXAMPLE_TEXT_2  = 'Example text 2';
     private const EXAMPLE_TEXT_3  = 'Example text 3';
     private const EXAMPLE_USER_ID = 1;
 
-    /**
-     * @return TextStorage\Service
-     */
-    private function getStorage()
+    private function getStorage(): TextStorage\Service
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
@@ -27,7 +24,10 @@ class ServiceTest extends PHPUnit_Framework_TestCase
         return $serviceManager->get(TextStorage\Service::class);
     }
 
-    public function testReadWrite()
+    /**
+     * @throws TextStorage\Exception
+     */
+    public function testReadWrite(): void
     {
         $storage = $this->getStorage();
 
@@ -53,7 +53,10 @@ class ServiceTest extends PHPUnit_Framework_TestCase
         $this->assertEquals([self::EXAMPLE_USER_ID], $userIds);
     }
 
-    public function testGetFirstText()
+    /**
+     * @throws TextStorage\Exception
+     */
+    public function testGetFirstText(): void
     {
         $storage = $this->getStorage();
 
@@ -67,7 +70,10 @@ class ServiceTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(self::EXAMPLE_TEXT_2, $text);
     }
 
-    public function testSecondTextNotAffectsFirst()
+    /**
+     * @throws TextStorage\Exception
+     */
+    public function testSecondTextNotAffectsFirst(): void
     {
         $storage = $this->getStorage();
 
@@ -82,14 +88,18 @@ class ServiceTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($textInfo1, $newTextInfo1);
     }
 
-    public function testThrowExceptionOnUnexpectedOption()
+    /**
+     * @throws TextStorage\Exception
+     */
+    public function testThrowExceptionOnUnexpectedOption(): void
     {
+        $this->expectException(TextStorage\Exception::class);
         new TextStorage\Service([
             'foo' => 'bar',
         ]);
     }
 
-    public function testReturnNullOnEmptyIds()
+    public function testReturnNullOnEmptyIds(): void
     {
         $storage = $this->getStorage();
 
@@ -98,7 +108,7 @@ class ServiceTest extends PHPUnit_Framework_TestCase
         $this->assertNull($text);
     }
 
-    public function testReturnNullWhenNothingFound()
+    public function testReturnNullWhenNothingFound(): void
     {
         $storage = $this->getStorage();
 
@@ -115,14 +125,20 @@ class ServiceTest extends PHPUnit_Framework_TestCase
         $this->assertNull($result);
     }
 
-    public function testThrowExceptionWhenSetUnexistentText()
+    /**
+     * @throws TextStorage\Exception
+     */
+    public function testThrowExceptionWhenSetUnexistentText(): void
     {
         $storage = $this->getStorage();
 
         $storage->setText(123456789, self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);
     }
 
-    public function testRevisionNumberIncresed()
+    /**
+     * @throws TextStorage\Exception
+     */
+    public function testRevisionNumberIncresed(): void
     {
         $storage = $this->getStorage();
 
@@ -135,7 +151,10 @@ class ServiceTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($textInfo1['revision'] + 1, $textInfo2['revision']);
     }
 
-    public function testRevisionNumberNotIncresedWhenTextNotChanged()
+    /**
+     * @throws TextStorage\Exception
+     */
+    public function testRevisionNumberNotIncresedWhenTextNotChanged(): void
     {
         $storage = $this->getStorage();
 
@@ -148,7 +167,10 @@ class ServiceTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($textInfo1['revision'], $textInfo2['revision']);
     }
 
-    public function testGetFirstTextIgnoreEmptyText()
+    /**
+     * @throws TextStorage\Exception
+     */
+    public function testGetFirstTextIgnoreEmptyText(): void
     {
         $storage = $this->getStorage();
 

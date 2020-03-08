@@ -6,11 +6,11 @@ namespace AutowpTest\TextStorage;
 
 use Autowp\TextStorage;
 use Laminas\Mvc\Application;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class ConfigTest extends PHPUnit_Framework_TestCase
+class ConfigTest extends TestCase
 {
-    public function testConfig()
+    public function testConfig(): void
     {
         $provider = new TextStorage\ConfigProvider();
         $config   = $provider();
@@ -19,7 +19,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('textstorage', $config);
     }
 
-    public function testTexStorageRegistered()
+    public function testTexStorageRegistered(): void
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
