@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AutowpTest\TextStorage;
 
-use Zend\Mvc\Application;
-
 use Autowp\TextStorage;
+use Laminas\Mvc\Application;
+use PHPUnit_Framework_TestCase;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends PHPUnit_Framework_TestCase
 {
     public function testConfig()
     {
         $provider = new TextStorage\ConfigProvider();
-        $config = $provider();
+        $config   = $provider();
 
         $this->assertArrayHasKey('dependencies', $config);
         $this->assertArrayHasKey('textstorage', $config);

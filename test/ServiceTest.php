@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AutowpTest\TextStorage;
 
-use Zend\Mvc\Application;
-
 use Autowp\TextStorage;
+use Laminas\Mvc\Application;
+use PHPUnit_Framework_TestCase;
 
-class SereviceTest extends \PHPUnit_Framework_TestCase
+class ServiceTest extends PHPUnit_Framework_TestCase
 {
-    const EXAMPLE_TEXT = 'Example text';
-    const EXAMPLE_TEXT_2 = 'Example text 2';
-    const EXAMPLE_TEXT_3 = 'Example text 3';
-    const EXAMPLE_USER_ID = 1;
+    private const EXAMPLE_TEXT    = 'Example text';
+    private const EXAMPLE_TEXT_2  = 'Example text 2';
+    private const EXAMPLE_TEXT_3  = 'Example text 3';
+    private const EXAMPLE_USER_ID = 1;
 
     /**
      * @return TextStorage\Service
@@ -42,7 +44,7 @@ class SereviceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([
             'text'     => self::EXAMPLE_TEXT,
             'revision' => $info['revision'],
-            'user_id'  => self::EXAMPLE_USER_ID
+            'user_id'  => self::EXAMPLE_USER_ID,
         ], $revisionInfo);
 
         $storage->setText($textId, self::EXAMPLE_TEXT_2, self::EXAMPLE_USER_ID);
@@ -69,7 +71,7 @@ class SereviceTest extends \PHPUnit_Framework_TestCase
     {
         $storage = $this->getStorage();
 
-        $textId1 = $storage->createText(self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);
+        $textId1   = $storage->createText(self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);
         $textInfo1 = $storage->getTextInfo($textId1);
 
         $textId2 = $storage->createText(self::EXAMPLE_TEXT_2, self::EXAMPLE_USER_ID);
@@ -80,13 +82,10 @@ class SereviceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($textInfo1, $newTextInfo1);
     }
 
-    /**
-     * @expectedException \Autowp\TextStorage\Exception
-     */
     public function testThrowExceptionOnUnexpectedOption()
     {
         new TextStorage\Service([
-            'foo' => 'bar'
+            'foo' => 'bar',
         ]);
     }
 
@@ -116,9 +115,6 @@ class SereviceTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($result);
     }
 
-    /**
-     * @expectedException \Autowp\TextStorage\Exception
-     */
     public function testThrowExceptionWhenSetUnexistentText()
     {
         $storage = $this->getStorage();
@@ -130,7 +126,7 @@ class SereviceTest extends \PHPUnit_Framework_TestCase
     {
         $storage = $this->getStorage();
 
-        $textId = $storage->createText(self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);
+        $textId    = $storage->createText(self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);
         $textInfo1 = $storage->getTextInfo($textId);
 
         $storage->setText($textId, self::EXAMPLE_TEXT_2, self::EXAMPLE_USER_ID);
@@ -143,7 +139,7 @@ class SereviceTest extends \PHPUnit_Framework_TestCase
     {
         $storage = $this->getStorage();
 
-        $textId = $storage->createText(self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);
+        $textId    = $storage->createText(self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);
         $textInfo1 = $storage->getTextInfo($textId);
 
         $storage->setText($textId, self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);

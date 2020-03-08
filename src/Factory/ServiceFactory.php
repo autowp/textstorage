@@ -1,20 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\TextStorage\Factory;
 
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
-
 use Autowp\TextStorage\Service;
+use Interop\Container\ContainerInterface;
+use Laminas\Db\Adapter\AdapterInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ServiceFactory implements FactoryInterface
 {
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param string $requestedName
+     * @return Service
+     */
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null)
     {
-        $config = $container->has('config') ? $container->get('config') : [];
-        $textstorageConfig = isset($config['textstorage']) ? $config['textstorage'] : [];
+        $config            = $container->has('config') ? $container->get('config') : [];
+        $textstorageConfig = $config['textstorage'] ?? [];
 
-        $textstorageConfig['dbAdapter'] = $container->get(\Zend\Db\Adapter\AdapterInterface::class);
+        $textstorageConfig['dbAdapter'] = $container->get(AdapterInterface::class);
 
         return new Service($textstorageConfig);
     }

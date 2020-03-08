@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\TextStorage;
 
 class ConfigProvider
@@ -11,7 +13,7 @@ class ConfigProvider
     {
         return [
             'dependencies' => $this->getDependencyConfig(),
-            'textstorage'  => $this->getTextStorageConfig()
+            'textstorage'  => $this->getTextStorageConfig(),
         ];
     }
 
@@ -24,8 +26,8 @@ class ConfigProvider
     {
         return [
             'factories' => [
-                Service::class => Factory\ServiceFactory::class
-            ]
+                Service::class => Factory\ServiceFactory::class,
+            ],
         ];
     }
 
@@ -37,7 +39,7 @@ class ConfigProvider
         return [
             'textTableName'     => 'textstorage_text',
             'revisionTableName' => 'textstorage_revision',
-            'dbAdapter'         => null
+            'dbAdapter'         => null,
         ];
     }
 }
