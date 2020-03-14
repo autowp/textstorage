@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Autowp\TextStorage;
 
+use ArrayObject;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Expression;
 use Laminas\Db\Sql\Select;
@@ -18,19 +19,14 @@ use function ucfirst;
 
 class Service
 {
-    /** @var Adapter */
     private ?Adapter $adapter;
 
-    /** @var TableGateway */
-    private ?TableGateway $textTable;
+    private TableGateway $textTable;
 
-    /** @var TableGateway */
-    private ?TableGateway $revisionTable;
+    private TableGateway $revisionTable;
 
-    /** @var string */
     private string $textTableName = 'textstorage_text';
 
-    /** @var string */
     private string $revisionTableName = 'textstorage_revision';
 
     /**
@@ -38,9 +34,7 @@ class Service
      */
     public function __construct(array $options = [])
     {
-        $this->adapter       = null;
-        $this->textTable     = null;
-        $this->revisionTable = null;
+        $this->adapter = null;
         $this->setOptions($options);
     }
 
@@ -86,7 +80,7 @@ class Service
 
     private function getTextTable(): TableGateway
     {
-        if (null === $this->textTable) {
+        if (! isset($this->textTable)) {
             $this->textTable = new TableGateway($this->textTableName, $this->adapter);
         }
 
@@ -95,7 +89,7 @@ class Service
 
     private function getRevisionTable(): TableGateway
     {
-        if (null === $this->revisionTable) {
+        if (! isset($this->revisionTable)) {
             $this->revisionTable = new TableGateway($this->revisionTableName, $this->adapter);
         }
 
@@ -107,52 +101,54 @@ class Service
         if (! $ids) {
             return null;
         }
-        $row = $this->getTextTable()->select(function (Select $select) use ($ids) {
-            $select
-                ->columns(['text'])
-                ->where([
-                    'id' => $ids,
-                    'length(text) > 0',
-                ])
-                ->order(new Expression(
-                    'FIELD(id, ' . implode(', ', array_fill(0, count($ids), '?')) . ')',
-                    $ids
-                ))
-                ->limit(1);
-        })->current();
 
-        if ($row) {
-            return $row['text'];
+        $select = $this->getTextTable()->getSql()->select()
+            ->columns(['text'])
+            ->where([
+                'id' => $ids,
+                'length(text) > 0',
+            ])
+            ->order(new Expression(
+                'FIELD(id, ' . implode(', ', array_fill(0, count($ids), '?')) . ')',
+                $ids
+            ))
+            ->limit(1);
+
+        $row = $this->getTextTable()->selectWith($select)->current();
+
+        if (! $row) {
+            return null;
         }
 
-        return null;
+        return $row['text'];
     }
 
     /**
-     * @return object|null
+     * @return array|ArrayObject|null
      */
-    private function getTextRow(int $id)
+    private function getTextRow(int $textID)
     {
-        return $this->getTextTable()->select(function (Select $select) use ($id) {
-            $select->where->equalTo('id', $id);
-            $select->limit(1);
-        })->current();
+        $select = $this->getTextTable()->getSql()->select()
+            ->where(['id' => $textID])
+            ->limit(1);
+
+        return $this->getTextTable()->selectWith($select)->current();
     }
 
-    public function getText(int $id): ?string
+    public function getText(int $textID): ?string
     {
-        $row = $this->getTextRow($id);
+        $row = $this->getTextRow($textID);
 
-        if ($row) {
-            return $row->text;
+        if (! $row) {
+            return null;
         }
 
-        return null;
+        return $row['text'];
     }
 
-    public function getTextInfo(int $id): ?array
+    public function getTextInfo(int $textID): ?array
     {
-        $row = $this->getTextRow($id);
+        $row = $this->getTextRow($textID);
 
         if ($row) {
             return [
@@ -164,10 +160,10 @@ class Service
         return null;
     }
 
-    public function getRevisionInfo(int $id, int $revision): ?array
+    public function getRevisionInfo(int $textID, int $revision): ?array
     {
         $row = $this->getRevisionTable()->select([
-            'text_id'  => $id,
+            'text_id'  => $textID,
             'revision' => $revision,
         ])->current();
 
@@ -185,12 +181,12 @@ class Service
     /**
      * @throws Exception
      */
-    public function setText(int $id, string $text, int $userId): int
+    public function setText(int $textID, string $text, int $userID): int
     {
-        $row = $this->getTextRow($id);
+        $row = $this->getTextRow($textID);
 
         if (! $row) {
-            throw new Exception(sprintf('Text `%s` not found', $id));
+            throw new Exception(sprintf('Text `%d` not found', $textID));
         }
 
         if ($row['text'] !== $text) {
@@ -202,14 +198,18 @@ class Service
                 'id' => $row['id'],
             ]);
 
-            $row = $this->getTextRow($id);
+            $row = $this->getTextRow($textID);
+
+            if (! $row) {
+                throw new Exception(sprintf('Text `%d` not found', $textID));
+            }
 
             $this->getRevisionTable()->insert([
                 'text_id'   => $row['id'],
                 'revision'  => $row['revision'],
                 'text'      => $row['text'],
                 'timestamp' => $row['last_updated'],
-                'user_id'   => $userId,
+                'user_id'   => $userID,
             ]);
         }
 
@@ -219,7 +219,7 @@ class Service
     /**
      * @throws Exception
      */
-    public function createText(string $text, int $userId): int
+    public function createText(string $text, int $userID): int
     {
         $table = $this->getTextTable();
 
@@ -229,18 +229,19 @@ class Service
             'last_updated' => new Expression('NOW()'),
         ]);
 
-        return $this->setText((int) $table->getLastInsertValue(), $text, $userId);
+        return $this->setText((int) $table->getLastInsertValue(), $text, $userID);
     }
 
-    public function getTextUserIds(int $id): array
+    public function getTextUserIds(int $textID): array
     {
-        $rows = $this->getRevisionTable()->select(function (Select $select) use ($id) {
-            $select
-                ->columns(['user_id'])
-                ->quantifier(Select::QUANTIFIER_DISTINCT);
-            $select->where->isNotNull('user_id');
-            $select->where->equalTo('text_id', $id);
-        });
+        $select = $this->getRevisionTable()->getSql()->select()
+            ->columns(['user_id'])
+            ->quantifier(Select::QUANTIFIER_DISTINCT)
+            ->where([
+                'user_id IS NOT NULL',
+                'text_id' => $textID,
+            ]);
+        $rows   = $this->getRevisionTable()->selectWith($select);
 
         $ids = [];
         foreach ($rows as $row) {

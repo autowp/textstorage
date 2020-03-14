@@ -163,8 +163,12 @@ class ServiceTest extends TestCase
         $textId    = $storage->createText(self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);
         $textInfo1 = $storage->getTextInfo($textId);
 
+        $this->assertIsArray($textInfo1);
+
         $storage->setText($textId, self::EXAMPLE_TEXT, self::EXAMPLE_USER_ID);
         $textInfo2 = $storage->getTextInfo($textId);
+
+        $this->assertIsArray($textInfo2);
 
         $this->assertEquals($textInfo1['revision'], $textInfo2['revision']);
     }

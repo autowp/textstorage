@@ -6,10 +6,6 @@ engines:
       - php
   phpmd:
     enabled: true
-    checks:
-      Naming/ShortVariable:
-        enabled: false
-        exceptions: id, db
   phpcodesniffer:
     enabled: true
   phan:
