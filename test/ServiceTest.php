@@ -140,7 +140,7 @@ class ServiceTest extends TestCase
     /**
      * @throws TextStorage\Exception
      */
-    public function testRevisionNumberIncresed(): void
+    public function testRevisionNumberIncreased(): void
     {
         $storage = $this->getStorage();
 
@@ -156,7 +156,7 @@ class ServiceTest extends TestCase
     /**
      * @throws TextStorage\Exception
      */
-    public function testRevisionNumberNotIncresedWhenTextNotChanged(): void
+    public function testRevisionNumberNotIncreasedWhenTextNotChanged(): void
     {
         $storage = $this->getStorage();
 
